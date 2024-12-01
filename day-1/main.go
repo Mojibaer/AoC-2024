@@ -45,6 +45,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fmt.Println("Part one: ", partOne(lList, rList))
+	fmt.Println("Part two: ", partTwo(lList, rList))
+
+}
+
+func partOne(lList []int, rList []int) int {
 	// Sort the Parts from Min to Max
 	sort.Ints(lList)
 	sort.Ints(rList)
@@ -62,7 +68,23 @@ func main() {
 		distance += tmp
 	}
 
-	//fmt.Println(lList)
-	//fmt.Println(rList)
-	fmt.Println(distance)
+	return distance
+}
+
+func partTwo(lList []int, rList []int) int {
+	var similarityScore int
+
+	for _, valueL := range lList {
+		tmp := 0
+
+		for _, valueR := range rList {
+			if valueL == valueR {
+				tmp += 1
+			}
+		}
+
+		similarityScore += valueL * tmp
+	}
+
+	return similarityScore
 }
