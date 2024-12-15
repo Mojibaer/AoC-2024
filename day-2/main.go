@@ -43,7 +43,7 @@ func main() {
 	}
 
 	//fmt.Println(partOne(lines))
-	fmt.Println("function two", partTwo(lines))
+	fmt.Println("Part Two Result: ", partTwo(lines))
 }
 
 func partOne(lines [][]int) int {
@@ -80,101 +80,49 @@ func partTwo(lines [][]int) int {
 	for _, line := range lines {
 		increase := false
 		decrease := false
-		tolerateCounter := 0
 
+		// Check first if the line is valid without any bad-levels
 		if increaseLine(line) || decreaseLine(line) {
 			safeCounter++
 			continue
 		}
 
 		for i := 0; i < len(line)-1; i++ {
-
 			x := line[i] - line[i+1]
 
-			// Case if x is out of range
-			if (x < -3) || (x > 3) {
-				tolerateCounter++
+			// Set Increase flag and check if ordering switches.
+			if (x > -4) && (x < 0) {
+				if decrease {
+					if isNewLineValid(line, i) {
+						safeCounter++
+					}
 
-				if tolerateCounter > 1 {
 					break
 				}
 
-				newLine := getNewLineWithoutCurrentIndex(line, i+1)
-
-				if tolerateCounter < 2 && (increaseLine(newLine) || decreaseLine(newLine)) {
-					safeCounter++
-				}
-			}
-
-			// Case if x is zero
-			if x == 0 {
-				tolerateCounter++
-
-				newLine := getNewLineWithoutCurrentIndex(line, i)
-
-				if tolerateCounter < 2 && (increaseLine(newLine) || decreaseLine(newLine)) {
-					safeCounter++
-				}
-
-				break
-			}
-
-			// Case if sorting switches from increase to decrease
-			if (x > 0) && ((x) < 4) && increase {
-				tolerateCounter++
-
-				newLine := getNewLineWithoutCurrentIndex(line, i)
-
-				if tolerateCounter < 2 && (increaseLine(newLine) || decreaseLine(newLine)) {
-					safeCounter++
-				}
-
-				break
-			}
-
-			// Case if sorting switches from decrease to increase
-			if (x < 0) && ((x) > -4) && decrease {
-				tolerateCounter++
-
-				newLine := getNewLineWithoutCurrentIndex(line, i)
-
-				if tolerateCounter < 2 && (increaseLine(newLine) || decreaseLine(newLine)) {
-					safeCounter++
-				}
-
-				break
-			}
-
-			// TolerateCounter check on increase
-			if (x < 0) && ((x) > -4) {
-				if decrease {
-					tolerateCounter++
-
-					if tolerateCounter > 1 {
-						break
-					}
-				}
-
 				increase = true
-				decrease = false
 			}
 
-			// TolerateCounter check on decrease
-			if (x > 0) && ((x) < 4) {
+			// Set Decrease flag and check if ordering switches.
+			if (x > 0) && (x < 4) {
 				if increase {
-					tolerateCounter++
-
-					if tolerateCounter > 1 {
-						break
+					if isNewLineValid(line, i) {
+						safeCounter++
 					}
+
+					break
 				}
 
-				increase = false
 				decrease = true
 			}
 
-			if i == len(line)-1 && tolerateCounter < 2 {
-				safeCounter++
+			// Case if x is out of range or zero
+			if (x < -3) || (x > 3) || (x == 0) {
+				if isNewLineValid(line, i) {
+					safeCounter++
+				}
+
+				break
 			}
 		}
 	}
@@ -219,4 +167,32 @@ func getNewLineWithoutCurrentIndex(line []int, index int) []int {
 	}
 
 	return newLine
+}
+
+// Check the line after a bad-level
+// by removing the current, after and previous index.
+func isNewLineValid(line []int, index int) bool {
+	newLine := getNewLineWithoutCurrentIndex(line, index)
+
+	if increaseLine(newLine) || decreaseLine(newLine) {
+		return true
+	}
+
+	if (index + 1) <= len(line) {
+		newLine = getNewLineWithoutCurrentIndex(line, index+1)
+
+		if increaseLine(newLine) || decreaseLine(newLine) {
+			return true
+		}
+	}
+
+	if (index - 1) <= len(line) {
+		newLine = getNewLineWithoutCurrentIndex(line, index-1)
+
+		if increaseLine(newLine) || decreaseLine(newLine) {
+			return true
+		}
+	}
+
+	return false
 }
