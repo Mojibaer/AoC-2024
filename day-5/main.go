@@ -43,6 +43,10 @@ func main() {
 	for _, line := range updatePage {
 		updateLine := strings.Split(line, ",")
 		if checkForward(rules, updateLine) {
+			continue
+		} else {
+			updateLine = updateIncorrectLine(rules, updateLine)
+
 			// Since the values treated as string, need to convert
 			// it to int to sum them.
 			midValue, err := strconv.Atoi(getMidValue(updateLine))
@@ -70,6 +74,28 @@ func checkForward(rules []string, pageUpdate []string) bool {
 		}
 	}
 	return true
+}
+
+func updateIncorrectLine(rules []string, pageUpdate []string) []string {
+	for i := 0; i < len(pageUpdate)-1; i++ {
+		ruleBreak := pageUpdate[i+1] + pageUpdate[i]
+
+		for _, value := range rules {
+			value := strings.Split(value, "|")
+			valueStr := value[0] + value[1]
+			if valueStr == ruleBreak {
+				tmp := pageUpdate[i]
+				pageUpdate[i] = pageUpdate[i+1]
+				pageUpdate[i+1] = tmp
+			}
+		}
+	}
+	// Check recursive is the line is in correct order
+	if !checkForward(rules, pageUpdate) {
+		updateIncorrectLine(rules, pageUpdate)
+	}
+
+	return pageUpdate
 }
 
 func getMidValue(pageUpdate []string) string {
