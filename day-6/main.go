@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	file, err := os.ReadFile("test-data.txt")
+	file, err := os.ReadFile("data.txt")
 
 	if err != nil {
 		panic(err)
@@ -22,7 +22,7 @@ func main() {
 
 	locatedPositions := getGuardsRoute(lines, guardsPos[1], guardsPos[0], locatedSpots, direction)
 
-	fmt.Println(locatedPositions)
+	fmt.Println(len(locatedPositions))
 
 }
 
@@ -49,54 +49,66 @@ func findGuard(lines []string) []int {
 // Get recursive the located spots.
 func getGuardsRoute(lines []string, x int, y int, locatedSpots map[string]byte, direction byte) map[string]byte {
 	line := lines[y]
-	locatedSpot := strconv.Itoa(y) + strconv.Itoa(x)
+	locatedSpot := strconv.Itoa(y) + "," + strconv.Itoa(x)
 	locatedSpots[locatedSpot] = 'X'
 
 	// Check if guard reached the top side of the map.
-	if y == 0 && direction == '^' {
+	if y == -1 && direction == '^' {
+		locatedSpots[locatedSpot] = 'X'
 		return locatedSpots
 	}
 
 	// Check if guard reached the right side of the map.
 	if len(line)-1 == x && direction == '>' {
+		locatedSpots[locatedSpot] = 'X'
 		return locatedSpots
 	}
 
 	// Check if guard reached the bottom of the map.
 	if len(lines)-1 == y && direction == 'v' {
+		locatedSpots[locatedSpot] = 'X'
 		return locatedSpots
 	}
 
 	// Check if guard reached the left side of the map.
-	if x == 0 && direction == '<' {
+	if x == -1 && direction == '<' {
+		locatedSpots[locatedSpot] = 'X'
 		return locatedSpots
 	}
 
 	// Handle the top move.
 	if direction == '^' && lines[y-1][x] != '#' {
+		locatedSpots[locatedSpot] = 'X'
 		y--
 	} else if direction == '^' && lines[y-1][x] == '#' {
+		locatedSpots[locatedSpot] = 'X'
 		direction = '>'
 	}
 
 	// Handle the right move.
-	if direction == '>' && line[x+1] != '#' {
+	if direction == '>' && lines[y][x+1] != '#' {
+		locatedSpots[locatedSpot] = 'X'
 		x++
 	} else if direction == '>' && lines[y][x+1] == '#' {
+		locatedSpots[locatedSpot] = 'X'
 		direction = 'v'
 	}
 
 	// Handle the bottom move.
 	if direction == 'v' && lines[y+1][x] != '#' {
+		locatedSpots[locatedSpot] = 'X'
 		y++
 	} else if direction == 'v' && lines[y+1][x] == '#' {
+		locatedSpots[locatedSpot] = 'X'
 		direction = '<'
 	}
 
 	// Handle the left move.
 	if direction == '<' && lines[y][x-1] != '#' {
+		locatedSpots[locatedSpot] = 'X'
 		x--
 	} else if direction == '<' && lines[y][x-1] == '#' {
+		locatedSpots[locatedSpot] = 'X'
 		direction = '^'
 	}
 
